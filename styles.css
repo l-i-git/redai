@@ -1,10 +1,10 @@
 body {
     font-family: Arial, sans-serif;
-    line-height: 1.6;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 20px;
-    background-color: #f4f4f4;
 }
+
 .container {
     max-width: 1200px;
     margin: auto;
@@ -13,20 +13,18 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
 h1 {
     color: #333;
     text-align: center;
-    margin-bottom: 20px;
 }
-.language-select {
-    text-align: right;
-    margin-bottom: 20px;
-}
+
 .category-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
+
 .category {
     width: 100%;
     margin-bottom: 20px;
@@ -35,30 +33,9 @@ h1 {
     padding: 15px;
     box-sizing: border-box;
 }
-h2 {
-    color: #444;
-    border-bottom: 2px solid #444;
-    padding-bottom: 5px;
-    margin-top: 0;
-}
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-li {
-    margin-bottom: 10px;
-}
-a {
-    color: #0066cc;
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
-}
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     .category {
-        width: calc(50% - 10px);
+        width: calc(33.33% - 20px); /* 每行三个类别，减去间距 */
     }
 }
