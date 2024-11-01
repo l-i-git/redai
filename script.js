@@ -1,78 +1,110 @@
-const translations = {
-    zh: {
-        mainTitle: "AI工具导航",
-        chatTitle: "对话",
-        imageTitle: "图像",
-        audioTitle: "音乐",
-        videoTitle: "视频",
-        developmentTitle: "开发",
-        pptTitle: "PPT"
+// 数据配置
+const categories = [
+    {
+        id: 'chat',
+        titleZh: '对话',
+        titleEn: 'Chat',
+        color: 'text-blue-600',
+        items: [
+            { name: 'ChatGPT', url: 'https://chat.openai.com/' },
+            { name: 'Claude', url: 'https://www.anthropic.com/' },
+        ],
     },
-    en: {
-        mainTitle: "AI Tools Navigation",
-        chatTitle: "Chat",
-        imageTitle: "Image",
-        audioTitle: "Audio",
-        videoTitle: "Video",
-        developmentTitle: "Development",
-        pptTitle: "Presentation"
+    // ... 其他类别数据 ...
+];
+
+// 状态管理
+let isDark = false;
+let language = 'zh';
+
+// 初始化函数
+function init() {
+    // 检查系统主题
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        toggleTheme();
     }
-};
-
-function updateLanguage(lang) {
-    const elements = {
-        mainTitle: document.getElementById('mainTitle'),
-        chatTitle: document.getElementById('chatTitle'),
-        imageTitle: document.getElementById('imageTitle'),
-        audioTitle: document.getElementById('audioTitle'),
-        videoTitle: document.getElementById('videoTitle'),
-        developmentTitle: document.getElementById('developmentTitle'),
-        pptTitle: document.getElementById('pptTitle')
-    };
-
-    Object.keys(elements).forEach(key => {
-        elements[key].textContent = translations[lang][key];
-    });
+    
+    // 渲染分类
+    renderCategories();
+    
+    // 事件监听
+    setupEventListeners();
 }
 
-// 检测用户浏览器语言
-const userLang = navigator.language || navigator.userLanguage;
-const defaultLang = userLang.startsWith('zh') ? 'zh' : 'en';
+// 渲染分类
+function renderCategories() {
+    const grid = document.getElementById('categoriesGrid');
+    grid.innerHTML = categories.map(category => `
+        <div class="w-full max-w-[160px] group hover:scale-105 transition-transform duration-300 flex items-center">
+            <div class="bg-white/50 dark:bg-neutral-800/50 rounded-lg p-2.5 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between flex-1">
+                <h2 class="text-base font-semibold ${category.color} text-center mb-2">
+                    ${language === 'zh' ? category.titleZh : category.titleEn}
+                </h2>
+                <ul class="space-y-1.5">
+                    ${category.items.map(item => `
+                        <li class="text-center">
+                            <a href="${item.url}" target="_blank" rel="noopener noreferrer"
+                               class="inline-block text-gray-700 hover:text-gray-900 transition-all duration-200 hover:scale-105 text-sm">
+                                ${item.name}
+                            </a>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        </div>
+    `).join('');
+}
 
-// 初始化语言
-updateLanguage(defaultLang);
-document.getElementById('languageSelect').value = defaultLang;
+// 设置事件监听
+function setupEventListeners() {
+    // 主题切换
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    
+    // 语言切换
+    document.getElementById('languageToggle').addEventListener('click', toggleLanguage);
+    
+    // 反馈表单提交
+    document.getElementById('feedbackForm').addEventListener('submit', handleFeedback);
+    
+    // 滚动效果
+    window.addEventListener('scroll', handleScroll);
+}
 
-// 语言选择事件监听
-document.getElementById('languageSelect').addEventListener('change', function() {
-    updateLanguage(this.value);
-});
+// 主题切换
+function toggleTheme() {
+    isDark = !isDark;
+    document.documentElement.classList.toggle('dark');
+    document.getElementById('moonIcon').classList.toggle('hidden');
+    document.getElementById('sunIcon').classList.toggle('hidden');
+}
 
-function updateLayout() {
-    const container = document.querySelector('.category-container');
-    const categories = document.querySelectorAll('.category');
-    const isPortrait = window.innerHeight > window.innerWidth;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// 语言切换
+function toggleLanguage() {
+    language = language === 'zh' ? 'en' : 'zh';
+    document.getElementById('subtitle').textContent = 
+        language === 'zh' ? '最快的ai导航' : 'Fastest AI Navigation';
+    document.getElementById('feedbackInput').placeholder = 
+        language === 'zh' ? '有什么想说的吗？随便聊聊吧 :)' : "What's on your mind? Let's chat :)";
+    renderCategories();
+}
 
-    if (isMobile && isPortrait) {
-        // 移动设备竖屏：两列布局
-        categories.forEach(cat => cat.style.width = 'calc(50% - 10px)');
-        container.style.flexDirection = 'row';
+// 处理反馈
+function handleFeedback(e) {
+    e.preventDefault();
+    const feedback = document.getElementById('feedbackInput').value;
+    console.log('Feedback submitted:', feedback);
+    document.getElementById('feedbackInput').value = '';
+}
+
+// 处理滚动
+function handleScroll() {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 20) {
+        navbar.classList.add('bg-white/80', 'dark:bg-neutral-900/80', 'backdrop-blur-md', 'shadow-sm');
     } else {
-        // 移动设备横屏或桌面：每个类别两行
-        categories.forEach(cat => {
-            cat.style.width = '100%';
-            const ul = cat.querySelector('ul');
-            ul.style.columnCount = '2';
-            ul.style.columnGap = '20px';
-        });
-        container.style.flexDirection = 'column';
+        navbar.classList.remove('bg-white/80', 'dark:bg-neutral-900/80', 'backdrop-blur-md', 'shadow-sm');
     }
 }
 
-// 初始加载时更新布局
-updateLayout();
-
-// 在窗口大小改变或设备方向变化时更新布局
-window.addEventListener('resize', updateLayout);
-window.addEventListener('orientationchange', updateLayout);
+// 初始化
+document.addEventListener('DOMContentLoaded', init); 
